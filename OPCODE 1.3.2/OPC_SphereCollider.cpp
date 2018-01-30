@@ -45,7 +45,7 @@ using namespace IceMaths;
 #define SET_CONTACT(prim_index, flag)									\
 	/* Set contact status */											\
 	mFlags |= flag;														\
-	mTouchedPrimitives->Add(prim_index);
+	mTouchedPrimitives->Add(udword(prim_index));
 
 //! Sphere-triangle overlap test
 #define SPHERE_PRIM(prim_index, flag)									\
@@ -101,6 +101,19 @@ bool SphereCollider::Collide(SphereCache& cache, const IceMaths::Sphere& sphere,
 
 	// Init collision query
 	if(InitQuery(cache, sphere, worlds, worldm))	return true;
+
+	// Special case for 1-leaf trees
+	if(mCurrentModel && mCurrentModel->HasSingleNode())
+	{
+		// Here we're supposed to perform a normal query, except our tree has a single node, i.e. just a few triangles
+		udword Nb = mIMesh->GetNbTriangles();
+		// Loop through all triangles
+		for(udword i=0;i<Nb;i++)
+		{
+			SPHERE_PRIM(i, OPC_CONTACT)
+		}
+		return true;
+	}
 
 	if(!model.HasLeafNodes())
 	{

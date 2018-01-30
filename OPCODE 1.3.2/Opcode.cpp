@@ -69,7 +69,7 @@ bool Opcode_Err (const char* msg, ...)
 bool Opcode::InitOpcode()
 {
 	gFile.open("opcode.log");
-	Log("// Initializing OPCODE\n\n");
+	IceLog("// Initializing OPCODE\n\n");
 	//LogAPIInfo();
 	return true;
 }
@@ -77,7 +77,7 @@ bool Opcode::InitOpcode()
 void ReleasePruningSorters();
 bool Opcode::CloseOpcode()
 {
-	Log("// Closing OPCODE\n\n");
+	IceLog("// Closing OPCODE\n\n");
 
 	ReleasePruningSorters();
 

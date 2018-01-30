@@ -157,7 +157,7 @@ bool HybridModel::Build(const OPCODECREATE& create)
 
 	// Look for degenerate faces.
 	udword NbDegenerate = create.mIMesh->CheckTopology();
-	if(NbDegenerate)	Log("OPCODE WARNING: found %d degenerate faces in model! Collision might report wrong results!\n", NbDegenerate);
+	if(NbDegenerate)	IceLog("OPCODE WARNING: found %d degenerate faces in model! Collision might report wrong results!\n", NbDegenerate);
 	// We continue nonetheless.... 
 
 	Release();	// Make sure previous tree has been discarded
@@ -209,7 +209,7 @@ bool HybridModel::Build(const OPCODECREATE& create)
 				Data->mLeaves[Data->mNbLeaves] = *current->GetAABB();
 
 				// Setup leaf data
-				udword Index = (size_t(current->GetPrimitives()) - size_t(Data->mBase))/sizeof(size_t);
+				udword Index = udword((size_t(current->GetPrimitives()) - size_t(Data->mBase)) / sizeof(udword));
 				Data->mTriangles[Data->mNbLeaves].SetData(current->GetNbPrimitives(), Index);
 
 				Data->mNbLeaves++;

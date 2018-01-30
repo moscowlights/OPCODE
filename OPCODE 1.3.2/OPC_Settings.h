@@ -35,7 +35,7 @@
 	#define OPC_CPU_COMPARE
 
 	//! Use FCOMI / FCMOV on Pentium-Pro based processors (comment that line to use plain C++)
-	#define OPC_USE_FCOMI
+//	#define OPC_USE_FCOMI
 
 	//! Use epsilon value in tri-tri overlap test
 	#define OPC_TRITRI_EPSILON_TEST
@@ -44,7 +44,7 @@
 //	#define OPC_USE_TREE_COHERENCE
 
 	//! Use callbacks or direct pointers. Using callbacks might be a bit slower (but probably not much)
-	#define OPC_USE_CALLBACKS
+//	#define OPC_USE_CALLBACKS // changed by Karlan
 
 	//! Support triangle and vertex strides or not. Using strides might be a bit slower (but probably not much)
 	//! HINT: Enable strides only if your vertices are NOT "tighly packed", ie, there are other info (not only
@@ -53,7 +53,7 @@
 	//!		  OpenGL vertex arrays, you should understand this fine.
 	//!		  Thus, if you always have an array of 'xzy' coordinates and an array for indices, it could be better
 	//!		  if you disable strides.
-//	#define OPC_USE_STRIDE
+	#define OPC_USE_STRIDE // changed by Karlan
 
 	//! Discard negative pointer in vanilla trees
 	#define OPC_NO_NEG_VANILLA_TREE

@@ -28,7 +28,7 @@
 	extern void Opcode_Log (const char* msg, ...);
 	extern bool Opcode_Err (const char* msg, ...);
 
-	#define	Log			Opcode_Log
+	#define	IceLog			Opcode_Log // Karlan: for compatible with xRay
 	#define	SetIceError		Opcode_Err
 //	#define	Log				{}
 //	#define	SetIceError(a,b)	false
