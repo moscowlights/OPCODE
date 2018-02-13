@@ -32,10 +32,10 @@
 	// #define OPC_DOUBLE_PRECISION
 
 	//! Use CPU comparisons (comment that line to use standard FPU compares)
-	#define OPC_CPU_COMPARE
+//	#define OPC_CPU_COMPARE // changed by Karlan
 
 	//! Use FCOMI / FCMOV on Pentium-Pro based processors (comment that line to use plain C++)
-//	#define OPC_USE_FCOMI
+//	#define OPC_USE_FCOMI // changed by Karlan
 
 	//! Use epsilon value in tri-tri overlap test
 	#define OPC_TRITRI_EPSILON_TEST

@@ -119,7 +119,7 @@ bool SphereCollider::Collide(SphereCache& cache, const IceMaths::Sphere& sphere,
 	{
 		if(model.IsQuantized())
 		{
-			const AABBQuantizedNoLeafTree* Tree = (const AABBQuantizedNoLeafTree*)model.GetTree();
+			const AABBQuantizedNoLeafTree* Tree = static_cast<const AABBQuantizedNoLeafTree *>(model.GetTree());
 
 			// Setup dequantization coeffs
 			mCenterCoeff	= Tree->mCenterCoeff;
@@ -131,7 +131,7 @@ bool SphereCollider::Collide(SphereCache& cache, const IceMaths::Sphere& sphere,
 		}
 		else
 		{
-			const AABBNoLeafTree* Tree = (const AABBNoLeafTree*)model.GetTree();
+			const AABBNoLeafTree* Tree = static_cast<const AABBNoLeafTree *>(model.GetTree());
 
 			// Perform collision query
 			if(SkipPrimitiveTests())	_CollideNoPrimitiveTest(Tree->GetNodes());
@@ -142,7 +142,7 @@ bool SphereCollider::Collide(SphereCache& cache, const IceMaths::Sphere& sphere,
 	{
 		if(model.IsQuantized())
 		{
-			const AABBQuantizedTree* Tree = (const AABBQuantizedTree*)model.GetTree();
+			const AABBQuantizedTree* Tree = static_cast<const AABBQuantizedTree *>(model.GetTree());
 
 			// Setup dequantization coeffs
 			mCenterCoeff	= Tree->mCenterCoeff;
@@ -154,7 +154,7 @@ bool SphereCollider::Collide(SphereCache& cache, const IceMaths::Sphere& sphere,
 		}
 		else
 		{
-			const AABBCollisionTree* Tree = (const AABBCollisionTree*)model.GetTree();
+			const AABBCollisionTree* Tree = static_cast<const AABBCollisionTree *>(model.GetTree());
 
 			// Perform collision query
 			if(SkipPrimitiveTests())	_CollideNoPrimitiveTest(Tree->GetNodes());
@@ -662,7 +662,7 @@ bool HybridSphereCollider::Collide(SphereCache& cache, const IceMaths::Sphere& s
 	{
 		if(model.IsQuantized())
 		{
-			const AABBQuantizedNoLeafTree* Tree = (const AABBQuantizedNoLeafTree*)model.GetTree();
+			const AABBQuantizedNoLeafTree* Tree = static_cast<const AABBQuantizedNoLeafTree *>(model.GetTree());
 
 			// Setup dequantization coeffs
 			mCenterCoeff	= Tree->mCenterCoeff;
@@ -673,7 +673,7 @@ bool HybridSphereCollider::Collide(SphereCache& cache, const IceMaths::Sphere& s
 		}
 		else
 		{
-			const AABBNoLeafTree* Tree = (const AABBNoLeafTree*)model.GetTree();
+			const AABBNoLeafTree* Tree = static_cast<const AABBNoLeafTree *>(model.GetTree());
 
 			// Perform collision query - we don't want primitive tests here!
 			_CollideNoPrimitiveTest(Tree->GetNodes());
@@ -683,7 +683,7 @@ bool HybridSphereCollider::Collide(SphereCache& cache, const IceMaths::Sphere& s
 	{
 		if(model.IsQuantized())
 		{
-			const AABBQuantizedTree* Tree = (const AABBQuantizedTree*)model.GetTree();
+			const AABBQuantizedTree* Tree = static_cast<const AABBQuantizedTree *>(model.GetTree());
 
 			// Setup dequantization coeffs
 			mCenterCoeff	= Tree->mCenterCoeff;
@@ -694,7 +694,7 @@ bool HybridSphereCollider::Collide(SphereCache& cache, const IceMaths::Sphere& s
 		}
 		else
 		{
-			const AABBCollisionTree* Tree = (const AABBCollisionTree*)model.GetTree();
+			const AABBCollisionTree* Tree = static_cast<const AABBCollisionTree *>(model.GetTree());
 
 			// Perform collision query - we don't want primitive tests here!
 			_CollideNoPrimitiveTest(Tree->GetNodes());

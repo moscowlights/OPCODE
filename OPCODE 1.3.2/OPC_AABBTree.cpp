@@ -58,8 +58,8 @@ AABBTreeNode::AABBTreeNode() :
 #ifndef OPC_NO_NEG_VANILLA_TREE
 	mNeg			(null),
 #endif
-	mNbPrimitives	(0),
-	mNodePrimitives	(null)
+	mNodePrimitives	(null),
+	mNbPrimitives	(0)
 {
 #ifdef OPC_USE_TREE_COHERENCE
 	mBitmask = 0;
@@ -75,8 +75,8 @@ AABBTreeNode::~AABBTreeNode()
 {
 	// Opcode 1.3:
 	const AABBTreeNode* Pos = GetPos();
-	const AABBTreeNode* Neg = GetNeg();
 #ifndef OPC_NO_NEG_VANILLA_TREE
+	const AABBTreeNode* Neg = GetNeg();
 	if(!(mPos&1))	DELETESINGLE(Pos);
 	if(!(mNeg&1))	DELETESINGLE(Neg);
 #else
@@ -180,9 +180,7 @@ bool AABBTreeNode::Subdivide(AABBTreeBuilder* builder)
 		for(udword i=0;i<mNbPrimitives;i++)
 		{
 			udword Index = mNodePrimitives[i];
-			Means.x+=builder->GetSplittingValue(Index, 0);
-			Means.y+=builder->GetSplittingValue(Index, 1);
-			Means.z+=builder->GetSplittingValue(Index, 2);
+			Means += builder->GetSplittingValues(Index);
 		}
 		Means/=float(mNbPrimitives);
 
@@ -191,12 +189,9 @@ bool AABBTreeNode::Subdivide(AABBTreeBuilder* builder)
 		for(udword i=0;i<mNbPrimitives;i++)
 		{
 			udword Index = mNodePrimitives[i];
-			float Cx = builder->GetSplittingValue(Index, 0);
-			float Cy = builder->GetSplittingValue(Index, 1);
-			float Cz = builder->GetSplittingValue(Index, 2);
-			Vars.x += (Cx - Means.x)*(Cx - Means.x);
-			Vars.y += (Cy - Means.y)*(Cy - Means.y);
-			Vars.z += (Cz - Means.z)*(Cz - Means.z);
+			Point Center = builder->GetSplittingValues(Index);
+			Point Delta = Center - Means;
+			Vars += Delta * Delta;
 		}
 		Vars/=float(mNbPrimitives-1);
 
@@ -314,8 +309,8 @@ bool AABBTreeNode::Subdivide(AABBTreeBuilder* builder)
 	builder->IncreaseCount(2);
 
 	// Assign children
-	AABBTreeNode* Pos = (AABBTreeNode*)GetPos();
-	AABBTreeNode* Neg = (AABBTreeNode*)GetNeg();
+	AABBTreeNode* Pos = const_cast<AABBTreeNode *>(GetPos());
+	AABBTreeNode* Neg = const_cast<AABBTreeNode *>(GetNeg());
 	Pos->mNodePrimitives	= &mNodePrimitives[0];
 	Pos->mNbPrimitives		= NbPos;
 	Neg->mNodePrimitives	= &mNodePrimitives[NbPos];
@@ -339,8 +334,8 @@ void AABBTreeNode::_BuildHierarchy(AABBTreeBuilder* builder)
 	Subdivide(builder);
 
 	// 3) Recurse
-	AABBTreeNode* Pos = (AABBTreeNode*)GetPos();
-	AABBTreeNode* Neg = (AABBTreeNode*)GetNeg();
+	AABBTreeNode* Pos = const_cast<AABBTreeNode *>(GetPos());
+	AABBTreeNode* Neg = const_cast<AABBTreeNode *>(GetNeg());
 	if(Pos)	Pos->_BuildHierarchy(builder);
 	if(Neg)	Neg->_BuildHierarchy(builder);
 }
@@ -357,8 +352,8 @@ void AABBTreeNode::_Refit(AABBTreeBuilder* builder)
 	builder->ComputeGlobalBox(mNodePrimitives, mNbPrimitives, mBV);
 
 	// 2) Recurse
-	AABBTreeNode* Pos = (AABBTreeNode*)GetPos();
-	AABBTreeNode* Neg = (AABBTreeNode*)GetNeg();
+	AABBTreeNode* Pos = const_cast<AABBTreeNode *>(GetPos());
+	AABBTreeNode* Neg = const_cast<AABBTreeNode *>(GetNeg());
 	if(Pos)	Pos->_Refit(builder);
 	if(Neg)	Neg->_Refit(builder);
 }
@@ -370,7 +365,7 @@ void AABBTreeNode::_Refit(AABBTreeBuilder* builder)
  *	Constructor.
  */
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-AABBTree::AABBTree() : mIndices(null), mTotalNbNodes(0), mPool(null)
+AABBTree::AABBTree() : mIndices(null), mPool(null), mTotalNbNodes(0)
 {
 }
 
@@ -415,7 +410,7 @@ bool AABBTree::Build(AABBTreeBuilder* builder)
 	builder->SetNbInvalidSplits(0);
 
 	// Initialize indices. This list will be modified during build.
-	mIndices = new udword[builder->mNbPrimitives];
+	mIndices = new dTriIndex[builder->mNbPrimitives];
 	CHECKALLOC(mIndices);
 	// Identity permutation
 	for(udword i=0;i<builder->mNbPrimitives;i++)	mIndices[i] = i;
@@ -528,7 +523,7 @@ bool AABBTree::Refit2(AABBTreeBuilder* builder)
 
 		if(Current.IsLeaf())
 		{
-			builder->ComputeGlobalBox(Current.GetPrimitives(), Current.GetNbPrimitives(), *(IceMaths::AABB*)Current.GetAABB());
+			builder->ComputeGlobalBox(Current.GetPrimitives(), Current.GetNbPrimitives(), *const_cast<IceMaths::AABB*>(Current.GetAABB()));
 		}
 		else
 		{
@@ -541,7 +536,7 @@ bool AABBTree::Refit2(AABBTreeBuilder* builder)
 			Min.Min(Min_);
 			Max.Max(Max_);
 
-			((IceMaths::AABB*)Current.GetAABB())->SetMinMax(Min, Max);
+			const_cast<AABB*>(Current.GetAABB())->SetMinMax(Min, Max);
 		}
 	}
 	return true;

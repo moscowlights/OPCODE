@@ -55,15 +55,15 @@ using namespace IceMaths;
  */
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 AABBTreeCollider::AABBTreeCollider() :
+	mIMesh0				(null),
+	mIMesh1				(null),
 	mNbBVBVTests		(0),
 	mNbPrimPrimTests	(0),
 	mNbBVPrimTests		(0),
 	mScale0				(1.0,1.0,1.0),
 	mScale1				(1.0,1.0,1.0),
 	mFullBoxBoxTest		(true),
-	mFullPrimBoxTest	(true),
-	mIMesh0				(null),
-	mIMesh1				(null)
+	mFullPrimBoxTest	(true)
 {
 }
 
@@ -138,8 +138,8 @@ bool AABBTreeCollider::Collide(BVTCache& cache, const IceMaths::Matrix4x4* world
 
 			if(0)
 			{
-				static GJKEngine GJK;
-				static bool GJKInitDone=false;
+				static GJKEngine GJK; -- not thread safe, store in ThreadLocalData
+				static bool GJKInitDone=false; -- not thread safe, to be removed
 				if(!GJKInitDone)
 				{
 					GJK.Enable(GJK_BACKUP_PROCEDURE);
@@ -155,7 +155,7 @@ bool AABBTreeCollider::Collide(BVTCache& cache, const IceMaths::Matrix4x4* world
 			}
 			else
 			{
-				static SVEngine SVE;
+				static SVEngine SVE; -- not thread safe, store in ThreadLocalData
 				SVE.SetCallbackObj0(Local::SVCallback);
 				SVE.SetCallbackObj1(Local::SVCallback);
 				SVE.SetUserData0(udword(cache.Model0->GetHull()));

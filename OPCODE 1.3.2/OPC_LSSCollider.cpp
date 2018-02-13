@@ -104,7 +104,7 @@ bool LSSCollider::Collide(LSSCache& cache, const IceMaths::LSS& lss, const Model
 	{
 		if(model.IsQuantized())
 		{
-			const AABBQuantizedNoLeafTree* Tree = (const AABBQuantizedNoLeafTree*)model.GetTree();
+			const AABBQuantizedNoLeafTree* Tree = static_cast<const AABBQuantizedNoLeafTree *>(model.GetTree());
 
 			// Setup dequantization coeffs
 			mCenterCoeff	= Tree->mCenterCoeff;
@@ -116,7 +116,7 @@ bool LSSCollider::Collide(LSSCache& cache, const IceMaths::LSS& lss, const Model
 		}
 		else
 		{
-			const AABBNoLeafTree* Tree = (const AABBNoLeafTree*)model.GetTree();
+			const AABBNoLeafTree* Tree = static_cast<const AABBNoLeafTree *>(model.GetTree());
 
 			// Perform collision query
 			if(SkipPrimitiveTests())	_CollideNoPrimitiveTest(Tree->GetNodes());
@@ -127,7 +127,7 @@ bool LSSCollider::Collide(LSSCache& cache, const IceMaths::LSS& lss, const Model
 	{
 		if(model.IsQuantized())
 		{
-			const AABBQuantizedTree* Tree = (const AABBQuantizedTree*)model.GetTree();
+			const AABBQuantizedTree* Tree = static_cast<const AABBQuantizedTree *>(model.GetTree());
 
 			// Setup dequantization coeffs
 			mCenterCoeff	= Tree->mCenterCoeff;
@@ -139,7 +139,7 @@ bool LSSCollider::Collide(LSSCache& cache, const IceMaths::LSS& lss, const Model
 		}
 		else
 		{
-			const AABBCollisionTree* Tree = (const AABBCollisionTree*)model.GetTree();
+			const AABBCollisionTree* Tree = static_cast<const AABBCollisionTree *>(model.GetTree());
 
 			// Perform collision query
 			if(SkipPrimitiveTests())	_CollideNoPrimitiveTest(Tree->GetNodes());
@@ -162,7 +162,7 @@ bool LSSCollider::Collide(LSSCache& cache, const IceMaths::LSS& lss, const Model
  *	\param		worldl		[in] lss world matrix, or null
  *	\param		worldm		[in] model's world matrix, or null
  *	\return		TRUE if we can return immediately
- *	\warning	SCALE NOT SUPPORTED IN LSS WORLD MATRIX. The matrix must contain rotation & translation parts only.
+ *	\warning	SCALE NOT SUPPORTED. The matrices must contain rotation & translation parts only.
  */
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 BOOL LSSCollider::InitQuery(LSSCache& cache, const IceMaths::LSS& lss, const IceMaths::Matrix4x4* worldl, const IceMaths::Matrix4x4* worldm)
@@ -645,7 +645,7 @@ bool HybridLSSCollider::Collide(LSSCache& cache, const IceMaths::LSS& lss, const
 	{
 		if(model.IsQuantized())
 		{
-			const AABBQuantizedNoLeafTree* Tree = (const AABBQuantizedNoLeafTree*)model.GetTree();
+			const AABBQuantizedNoLeafTree* Tree = static_cast<const AABBQuantizedNoLeafTree *>(model.GetTree());
 
 			// Setup dequantization coeffs
 			mCenterCoeff	= Tree->mCenterCoeff;
@@ -656,7 +656,7 @@ bool HybridLSSCollider::Collide(LSSCache& cache, const IceMaths::LSS& lss, const
 		}
 		else
 		{
-			const AABBNoLeafTree* Tree = (const AABBNoLeafTree*)model.GetTree();
+			const AABBNoLeafTree* Tree = static_cast<const AABBNoLeafTree *>(model.GetTree());
 
 			// Perform collision query - we don't want primitive tests here!
 			_CollideNoPrimitiveTest(Tree->GetNodes());
@@ -666,7 +666,7 @@ bool HybridLSSCollider::Collide(LSSCache& cache, const IceMaths::LSS& lss, const
 	{
 		if(model.IsQuantized())
 		{
-			const AABBQuantizedTree* Tree = (const AABBQuantizedTree*)model.GetTree();
+			const AABBQuantizedTree* Tree = static_cast<const AABBQuantizedTree *>(model.GetTree());
 
 			// Setup dequantization coeffs
 			mCenterCoeff	= Tree->mCenterCoeff;
@@ -677,7 +677,7 @@ bool HybridLSSCollider::Collide(LSSCache& cache, const IceMaths::LSS& lss, const
 		}
 		else
 		{
-			const AABBCollisionTree* Tree = (const AABBCollisionTree*)model.GetTree();
+			const AABBCollisionTree* Tree = static_cast<const AABBCollisionTree *>(model.GetTree());
 
 			// Perform collision query - we don't want primitive tests here!
 			_CollideNoPrimitiveTest(Tree->GetNodes());

@@ -1,6 +1,11 @@
 
 // Should be included by Opcode.h if needed
 
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+// Include Guard
+#ifndef __OPC_ICEHOOK_H__
+#define __OPC_ICEHOOK_H__
+
 	#define ICE_DONT_CHECK_COMPILER_OPTIONS
 
 	// From Windows...
@@ -34,6 +39,8 @@
 //	#define	SetIceError(a,b)	false
 
 	#define	EC_OUTOFMEMORY	"Out of memory"
+
+	extern void OPCODE_NORETURN	IceAbort();
 
 	#include "Ice/IcePreprocessor.h"
 
@@ -73,4 +80,7 @@
 		#include "Ice/IceSegment.h"
 		#include "Ice/IceLSS.h"
 	}
-	//using namespace IceMaths;
+	using namespace IceMaths;
+
+
+#endif // __OPC_ICEHOOK_H__

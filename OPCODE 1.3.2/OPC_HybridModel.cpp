@@ -93,8 +93,8 @@ using namespace Opcode;
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 HybridModel::HybridModel() :
 	mNbLeaves		(0),
-	mNbPrimitives	(0),
 	mTriangles		(null),
+	mNbPrimitives	(0),
 	mIndices		(null)
 {
 }
@@ -140,7 +140,7 @@ void HybridModel::Release()
 		udword			mNbLeaves;
 		IceMaths::AABB*			mLeaves;
 		LeafTriangles*	mTriangles;
-		const udword*	mBase;
+		const dTriIndex*	mBase;
 	};
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -355,7 +355,7 @@ bool HybridModel::Refit()
 	IceMaths::Point Min,Max;
 	IceMaths::Point Min_,Max_;
 	udword Index = mTree->GetNbNodes();
-	AABBNoLeafNode* Nodes = (AABBNoLeafNode*)((AABBNoLeafTree*)mTree)->GetNodes();
+	AABBNoLeafNode* Nodes = const_cast<AABBNoLeafNode *>(static_cast<const AABBNoLeafNode *>(static_cast<AABBNoLeafTree *>(mTree)->GetNodes()));
 	while(Index--)
 	{
 		AABBNoLeafNode& Current = Nodes[Index];

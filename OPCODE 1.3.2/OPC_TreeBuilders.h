@@ -66,7 +66,7 @@
 		 *	\return		true if success
 		 */
 		///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-		virtual						bool			ComputeGlobalBox(const udword* primitives, udword nb_prims, IceMaths::AABB& global_box)	const	= 0;
+		virtual						bool			ComputeGlobalBox(const dTriIndex* primitives, udword nb_prims, IceMaths::AABB& global_box)	const	= 0;
 
 		///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 		/**
@@ -77,6 +77,7 @@
 		 */
 		///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 		virtual						float			GetSplittingValue(udword index, udword axis)	const	= 0;
+		virtual						Point			GetSplittingValues(udword index)		const	= 0;
 
 		///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 		/**
@@ -88,7 +89,7 @@
 		 *	\return		splitting value
 		 */
 		///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-		virtual						float			GetSplittingValue(const udword* primitives, udword nb_prims, const IceMaths::AABB& global_box, udword axis)	const
+		virtual						float			GetSplittingValue(const dTriIndex* primitives, udword nb_prims, const IceMaths::AABB& global_box, udword axis)	const
 													{
 														// Default split value = middle of the axis (using only the box)
 														return global_box.GetCenter(axis);
@@ -103,7 +104,7 @@
 		 *	\return		TRUE if the node should be subdivised
 		 */
 		///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-		virtual						BOOL			ValidateSubdivision(const udword* primitives, udword nb_prims, const IceMaths::AABB& global_box)
+		virtual						BOOL			ValidateSubdivision(const dTriIndex* primitives, udword nb_prims, const IceMaths::AABB& global_box)
 													{
 														// Check the user-defined limit
 														if(nb_prims<=mSettings.mLimit)	return FALSE;
@@ -135,9 +136,10 @@
 		//! Destructor
 		virtual										~AABBTreeOfVerticesBuilder()						{}
 
-		override(AABBTreeBuilder)	bool			ComputeGlobalBox(const udword* primitives, udword nb_prims, IceMaths::AABB& global_box)	const;
+		override(AABBTreeBuilder)	bool			ComputeGlobalBox(const dTriIndex* primitives, udword nb_prims, IceMaths::AABB& global_box)	const;
 		override(AABBTreeBuilder)	float			GetSplittingValue(udword index, udword axis)									const;
-		override(AABBTreeBuilder)	float			GetSplittingValue(const udword* primitives, udword nb_prims, const IceMaths::AABB& global_box, udword axis)	const;
+		override(AABBTreeBuilder)	Point			GetSplittingValues(udword index) const;
+		override(AABBTreeBuilder)	float			GetSplittingValue(const dTriIndex* primitives, udword nb_prims, const IceMaths::AABB& global_box, udword axis)	const;
 
 		const						IceMaths::Point*			mVertexArray;		//!< Shortcut to an app-controlled array of vertices.
 	};
@@ -150,8 +152,9 @@
 		//! Destructor
 		virtual										~AABBTreeOfAABBsBuilder()					{}
 
-		override(AABBTreeBuilder)	bool			ComputeGlobalBox(const udword* primitives, udword nb_prims, IceMaths::AABB& global_box)	const;
+		override(AABBTreeBuilder)	bool			ComputeGlobalBox(const dTriIndex* primitives, udword nb_prims, IceMaths::AABB& global_box)	const;
 		override(AABBTreeBuilder)	float			GetSplittingValue(udword index, udword axis)									const;
+		override(AABBTreeBuilder)	Point			GetSplittingValues(udword index) const;
 
 		const						IceMaths::AABB*			mAABBArray;			//!< Shortcut to an app-controlled array of AABBs.
 	};
@@ -164,9 +167,10 @@
 		//! Destructor
 		virtual										~AABBTreeOfTrianglesBuilder()													{}
 
-		override(AABBTreeBuilder)	bool			ComputeGlobalBox(const udword* primitives, udword nb_prims, IceMaths::AABB& global_box)	const;
+		override(AABBTreeBuilder)	bool			ComputeGlobalBox(const dTriIndex* primitives, udword nb_prims, IceMaths::AABB& global_box)	const;
 		override(AABBTreeBuilder)	float			GetSplittingValue(udword index, udword axis)									const;
-		override(AABBTreeBuilder)	float			GetSplittingValue(const udword* primitives, udword nb_prims, const IceMaths::AABB& global_box, udword axis)	const;
+		override(AABBTreeBuilder)	float			GetSplittingValue(const dTriIndex* primitives, udword nb_prims, const IceMaths::AABB& global_box, udword axis)	const;
+		override(AABBTreeBuilder)	Point			GetSplittingValues(udword index) const;
 
 		const				MeshInterface*			mIMesh;			//!< Shortcut to an app-controlled mesh interface
 	};

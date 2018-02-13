@@ -15,15 +15,6 @@
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // Things to help us compile on non-windows platforms
 
-#if defined(__MACOSX__) || defined(__APPLE__)
-#undef bool
-#define bool char
-#undef true
-#define true ((bool)-1)
-#undef false
-#define false ((bool)0)
-#endif // mac stuff
-
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 	#define USE_HANDLE_MANAGER
@@ -68,7 +59,6 @@
 	typedef float				float32;	//!< sizeof(float32)	must be 4
 	typedef double				float64;	//!< sizeof(float64)	must be 4
 
-	ICE_COMPILE_TIME_ASSERT(sizeof(bool)==1);	// ...otherwise things might fail with VC++ 4.2 !
 	ICE_COMPILE_TIME_ASSERT(sizeof(ubyte)==1);
 	ICE_COMPILE_TIME_ASSERT(sizeof(sbyte)==1);
 	ICE_COMPILE_TIME_ASSERT(sizeof(sword)==2);
@@ -137,7 +127,7 @@
 
 	#define ONE_OVER_RAND_MAX		(1.0f / float(RAND_MAX))	//!< Inverse of the max possible value returned by rand()
 
-	typedef int					(__stdcall* PROC)();			//!< A standard procedure call.
+	// typedef int					(__stdcall* PROC)();	-- Oleh Derevenko: Conflicts with Windows headers in x64 mode	//!< A standard procedure call. 
 	typedef bool				(*ENUMERATION)(udword value, udword param, udword context);	//!< ICE standard enumeration call
 	typedef	void**				VTABLE;							//!< A V-Table.
 

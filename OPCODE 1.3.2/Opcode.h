@@ -16,10 +16,18 @@
  */
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
+// Karlan: это адский костыль оправданный тем, что в Prosectors € раздел€ю библиотеки и не хочу плодить циклические зависимости (так что внимательно смотрите что используете в ODE!)
+typedef unsigned int dTriIndex; // Karlan: ставьте unsigned short, если используете одешные тримешы и 16 битные индексы (p.s. а гимпакт исключает опкод :))
+
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // Include Guard
 #ifndef __OPCODE_H__
 #define __OPCODE_H__
+
+// stddef.h and stdarg.h must be included before Opcode headers 
+// as they latermay not compile being not able to find types in std::
+#include <stddef.h>
+#include <stdarg.h>
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // Things to help us compile on non-windows platforms
@@ -42,6 +50,15 @@
 #define __stdcall /* */
 #endif
 #endif
+
+#if defined(__GNUC__)
+#define OPCODE_NORETURN __attribute__((noreturn))
+#elif defined(_MSC_VER)
+#define OPCODE_NORETURN __declspec(noreturn)
+#else // #if !defined(_MSC_VER)
+#define OPCODE_NORETURN
+#endif // #if !defined(__GNUC__)
+
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // Compilation messages
@@ -78,12 +95,12 @@
 	#define OPCODE_API
 #endif
 
+	#include "OPC_Settings.h"
 	#include "OPC_IceHook.h"
 
 	namespace Opcode
 	{
 		// Bulk-of-the-work
-		#include "OPC_Settings.h"
 		#include "OPC_Common.h"
 		#include "OPC_MeshInterface.h"
 		// Builders
@@ -111,7 +128,9 @@
 		#include "OPC_BoxPruning.h"
 		#include "OPC_SweepAndPrune.h"
 
-		FUNCTION OPCODE_API bool InitOpcode();
+
+		typedef void (*OPCODE_AbortHandler)();
+		FUNCTION OPCODE_API bool InitOpcode(OPCODE_AbortHandler fnAbortHandler=NULL);
 		FUNCTION OPCODE_API bool CloseOpcode();
 	}
 

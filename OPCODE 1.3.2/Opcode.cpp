@@ -66,23 +66,28 @@ bool Opcode_Err (const char* msg, ...)
 	return false;
 }
 
-bool Opcode::InitOpcode()
+using namespace Opcode;
+
+
+static OPCODE_AbortHandler g_fnAbortHandler = NULL;
+
+
+bool Opcode::InitOpcode(OPCODE_AbortHandler fnAbortHandler/*=NULL*/)
 {
-	gFile.open("opcode.log");
-	IceLog("// Initializing OPCODE\n\n");
-	//LogAPIInfo();
+	//Log("// Initializing OPCODE\n\n");
+//	LogAPIInfo();
+
+	g_fnAbortHandler = fnAbortHandler;
 	return true;
 }
 
-void ReleasePruningSorters();
 bool Opcode::CloseOpcode()
 {
-	IceLog("// Closing OPCODE\n\n");
-
-	ReleasePruningSorters();
+	//Log("// Closing OPCODE\n\n");
 
 	return true;
 }
+
 
 #ifdef ICE_MAIN
 
@@ -95,3 +100,14 @@ void ModuleDetach()
 }
 
 #endif
+
+/*extern */
+void OPCODE_NORETURN IceAbort()
+{
+	if (g_fnAbortHandler != NULL)
+	{
+		g_fnAbortHandler();
+	}
+
+	abort();
+}

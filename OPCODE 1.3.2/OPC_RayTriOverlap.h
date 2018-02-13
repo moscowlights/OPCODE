@@ -45,7 +45,7 @@
 
 	if(mCulling)
 	{
-		if(det<LOCAL_EPSILON)														return FALSE;
+		if(det <= LOCAL_EPSILON * FCMin2(edge1.SquareMagnitude(), edge2.SquareMagnitude())) return FALSE;
 		// From here, det is > 0. So we can use integer cmp.
 
 		// Calculate distance from vert0 to ray origin
@@ -77,7 +77,7 @@
 	else
 	{
 		// the non-culling branch
-		if(det>-LOCAL_EPSILON && det<LOCAL_EPSILON)									return FALSE;
+		if(FastFabs(det) <= LOCAL_EPSILON * FCMin2(edge1.SquareMagnitude(), edge2.SquareMagnitude())) return FALSE;
 		float OneOverDet = 1.0f / det;
 
 		// Calculate distance from vert0 to ray origin

@@ -35,11 +35,14 @@
 		inline_					~Matrix3x3()								{}
 
 		//! Assign values
-		inline_	void			Set(float m00, float m01, float m02, float m10, float m11, float m12, float m20, float m21, float m22)
+		template<typename trotationfloat>
+		inline_	void			Set(trotationfloat m00, trotationfloat m01, trotationfloat m02, 
+									trotationfloat m10, trotationfloat m11, trotationfloat m12, 
+									trotationfloat m20, trotationfloat m21, trotationfloat m22)
 								{
-									m[0][0] = m00;	m[0][1] = m01;	m[0][2] = m02;
-									m[1][0] = m10;	m[1][1] = m11;	m[1][2] = m12;
-									m[2][0] = m20;	m[2][1] = m21;	m[2][2] = m22;
+									m[0][0] = (float)m00;	m[0][1] = (float)m01;	m[0][2] = (float)m02;
+									m[1][0] = (float)m10;	m[1][1] = (float)m11;	m[1][2] = (float)m12;
+									m[2][0] = (float)m20;	m[2][1] = (float)m21;	m[2][2] = (float)m22;
 								}
 
 		//! Sets the scale from a Point. The point is put on the diagonal.
@@ -286,9 +289,9 @@
 		//! Transpose the matrix.
 				void			Transpose()
 								{
-									IR(m[1][0]) ^= IR(m[0][1]);	IR(m[0][1]) ^= IR(m[1][0]);	IR(m[1][0]) ^= IR(m[0][1]);
-									IR(m[2][0]) ^= IR(m[0][2]);	IR(m[0][2]) ^= IR(m[2][0]);	IR(m[2][0]) ^= IR(m[0][2]);
-									IR(m[2][1]) ^= IR(m[1][2]);	IR(m[1][2]) ^= IR(m[2][1]);	IR(m[2][1]) ^= IR(m[1][2]);
+									TSwap(m[1][0], m[0][1]);
+									TSwap(m[2][0], m[0][2]);
+									TSwap(m[2][1], m[1][2]);
 								}
 
 		//! this = Transpose(a)
@@ -309,7 +312,7 @@
 		//! Compute a cofactor. Used for matrix inversion.
 				float			CoFactor(ubyte row, ubyte column)	const
 				{
-					static sdword gIndex[3+2] = { 0, 1, 2, 0, 1 };
+					static const sdword gIndex[3+2] = { 0, 1, 2, 0, 1 };
 					return	(m[gIndex[row+1]][gIndex[column+1]]*m[gIndex[row+2]][gIndex[column+2]] - m[gIndex[row+2]][gIndex[column+1]]*m[gIndex[row+1]][gIndex[column+2]]);
 				}
 */

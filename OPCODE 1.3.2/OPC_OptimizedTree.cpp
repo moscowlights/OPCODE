@@ -73,7 +73,7 @@ using namespace Opcode;
 //! Compilation flag:
 //! - true to fix quantized boxes (i.e. make sure they enclose the original ones)
 //! - false to see the effects of quantization errors (faster, but wrong results in some cases)
-static bool gFixQuantized = true;
+static const bool gFixQuantized = true;
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 /**
@@ -241,14 +241,14 @@ bool AABBCollisionTree::Build(AABBTree* tree)
 	{
 		mNbNodes = NbNodes;
 		DELETEARRAY(mNodes);
-		mNodes = new AABBCollisionNode[mNbNodes];
+		mNodes = new AABBCollisionNode[NbNodes];
 		CHECKALLOC(mNodes);
 	}
 
 	// Build the tree
 	udword CurID = 1;
 	_BuildCollisionTree(mNodes, 0, CurID, tree);
-	ASSERT(CurID==mNbNodes);
+	ASSERT(CurID==NbNodes);
 
 	return true;
 }
@@ -328,22 +328,23 @@ bool AABBNoLeafTree::Build(AABBTree* tree)
 	if(!tree)	return false;
 	// Check the input tree is complete
 	udword NbTriangles	= tree->GetNbPrimitives();
-	udword NbNodes		= tree->GetNbNodes();
-	if(NbNodes!=NbTriangles*2-1)	return false;
+	udword NbExistingNodes		= tree->GetNbNodes();
+	if(NbExistingNodes!=NbTriangles*2-1)	return false;
 
+	udword NbNodes = NbTriangles-1;
 	// Get nodes
-	if(mNbNodes!=NbTriangles-1)	// Same number of nodes => keep moving
+	if(mNbNodes!=NbNodes)	// Same number of nodes => keep moving
 	{
-		mNbNodes = NbTriangles-1;
+		mNbNodes = NbNodes;
 		DELETEARRAY(mNodes);
-		mNodes = new AABBNoLeafNode[mNbNodes];
+		mNodes = new AABBNoLeafNode[NbNodes];
 		CHECKALLOC(mNodes);
 	}
 
 	// Build the tree
 	udword CurID = 1;
 	_BuildNoLeafTree(mNodes, 0, CurID, tree);
-	ASSERT(CurID==mNbNodes);
+	ASSERT(CurID==NbNodes);
 
 	return true;
 }
@@ -476,16 +477,17 @@ bool AABBNoLeafTree::Walk(GenericWalkingCallback callback, void* user_data) cons
 // a single extents. While extents would be the biggest, the center wouldn't.
 #define FIND_MAX_VALUES																			\
 	/* Get max values */																		\
-	IceMaths::Point CMax(MIN_FLOAT, MIN_FLOAT, MIN_FLOAT);												\
-	IceMaths::Point EMax(MIN_FLOAT, MIN_FLOAT, MIN_FLOAT);												\
-	for(udword i=0;i<mNbNodes;i++)																\
+	Point CMax(MIN_FLOAT, MIN_FLOAT, MIN_FLOAT);												\
+	Point EMax(MIN_FLOAT, MIN_FLOAT, MIN_FLOAT);												\
+	const udword NbNodes = mNbNodes;                                                            \
+	for(udword i=0;i<NbNodes;i++)																\
 	{																							\
-		if(fabsf(Nodes[i].mAABB.mCenter.x)>CMax.x)	CMax.x = fabsf(Nodes[i].mAABB.mCenter.x);	\
-		if(fabsf(Nodes[i].mAABB.mCenter.y)>CMax.y)	CMax.y = fabsf(Nodes[i].mAABB.mCenter.y);	\
-		if(fabsf(Nodes[i].mAABB.mCenter.z)>CMax.z)	CMax.z = fabsf(Nodes[i].mAABB.mCenter.z);	\
-		if(fabsf(Nodes[i].mAABB.mExtents.x)>EMax.x)	EMax.x = fabsf(Nodes[i].mAABB.mExtents.x);	\
-		if(fabsf(Nodes[i].mAABB.mExtents.y)>EMax.y)	EMax.y = fabsf(Nodes[i].mAABB.mExtents.y);	\
-		if(fabsf(Nodes[i].mAABB.mExtents.z)>EMax.z)	EMax.z = fabsf(Nodes[i].mAABB.mExtents.z);	\
+		float cx = fabsf(Nodes[i].mAABB.mCenter.x); if(cx>CMax.x)	CMax.x = cx;	            \
+		float cy = fabsf(Nodes[i].mAABB.mCenter.y); if(cy>CMax.y)	CMax.y = cy;	            \
+		float cz = fabsf(Nodes[i].mAABB.mCenter.z); if(cz>CMax.z)	CMax.z = cz;	            \
+		float ex = fabsf(Nodes[i].mAABB.mExtents.x); if(ex>EMax.x)	EMax.x = ex;	            \
+		float ey = fabsf(Nodes[i].mAABB.mExtents.y); if(ey>EMax.y)	EMax.y = ey;	            \
+		float ez = fabsf(Nodes[i].mAABB.mExtents.z); if(ez>EMax.z)	EMax.z = ez;	            \
 	}
 
 #define INIT_QUANTIZATION													\
@@ -551,7 +553,7 @@ bool AABBNoLeafTree::Walk(GenericWalkingCallback callback, void* user_data) cons
 	{																\
 		/* Compute box number */									\
 		size_t Nb = (Data - size_t(Nodes))/Nodes[i].GetNodeSize();	\
-		Data = (size_t) &mNodes[Nb]		;									\
+		Data = (size_t) &mNodes[Nb];								\
 	}																\
 	/* ...remapped */												\
 	mNodes[i].member = Data;
@@ -594,7 +596,7 @@ bool AABBQuantizedTree::Build(AABBTree* tree)
 	// Get nodes
 	mNbNodes = NbNodes;
 	DELETEARRAY(mNodes);
-	AABBCollisionNode* Nodes = new AABBCollisionNode[mNbNodes];
+	AABBCollisionNode* Nodes = new AABBCollisionNode[NbNodes];
 	CHECKALLOC(Nodes);
 
 	// Build the tree
@@ -603,24 +605,27 @@ bool AABBQuantizedTree::Build(AABBTree* tree)
 
 	// Quantize
 	{
-		mNodes = new AABBQuantizedNode[mNbNodes];
-		CHECKALLOC(mNodes);
+		mNodes = new AABBQuantizedNode[NbNodes];
 
-		// Get max values
-		FIND_MAX_VALUES
+		if (mNodes != null)
+		{
+			// Get max values
+			FIND_MAX_VALUES
 
 		// Quantization
 		INIT_QUANTIZATION
 
-		// Quantize
-		size_t Data;
-		for(udword i=0;i<mNbNodes;i++)
-		{
-			PERFORM_QUANTIZATION
-			REMAP_DATA(mData)
+			// Quantize
+			size_t Data;
+			for(udword i=0;i<NbNodes;i++)
+			{
+				PERFORM_QUANTIZATION
+					REMAP_DATA(mData, AABBCollisionNode)
+			}
 		}
 
 		DELETEARRAY(Nodes);
+		CHECKALLOC(mNodes);
 	}
 
 	return true;
@@ -702,41 +707,45 @@ bool AABBQuantizedNoLeafTree::Build(AABBTree* tree)
 	if(!tree)	return false;
 	// Check the input tree is complete
 	udword NbTriangles	= tree->GetNbPrimitives();
-	udword NbNodes		= tree->GetNbNodes();
-	if(NbNodes!=NbTriangles*2-1)	return false;
+	udword NbExistingNodes = tree->GetNbNodes();
+	if(NbExistingNodes!=NbTriangles*2-1)	return false;
 
 	// Get nodes
-	mNbNodes = NbTriangles-1;
+	udword NbNodes = NbTriangles-1;
+	mNbNodes = NbNodes;
 	DELETEARRAY(mNodes);
-	AABBNoLeafNode* Nodes = new AABBNoLeafNode[mNbNodes];
+	AABBNoLeafNode* Nodes = new AABBNoLeafNode[NbNodes];
 	CHECKALLOC(Nodes);
 
 	// Build the tree
 	udword CurID = 1;
 	_BuildNoLeafTree(Nodes, 0, CurID, tree);
-	ASSERT(CurID==mNbNodes);
+	ASSERT(CurID==NbNodes);
 
 	// Quantize
 	{
-		mNodes = new AABBQuantizedNoLeafNode[mNbNodes];
-		CHECKALLOC(mNodes);
+		mNodes = new AABBQuantizedNoLeafNode[NbNodes];
 
-		// Get max values
-		FIND_MAX_VALUES
+		if (mNodes != null)
+		{
+			// Get max values
+			FIND_MAX_VALUES
 
 		// Quantization
 		INIT_QUANTIZATION
 
-		// Quantize
-		size_t Data;
-		for(udword i=0;i<mNbNodes;i++)
-		{
-			PERFORM_QUANTIZATION
-			REMAP_DATA(mPosData)
-			REMAP_DATA(mNegData)
+			// Quantize
+			size_t Data;
+			for(udword i=0;i<NbNodes;i++)
+			{
+				PERFORM_QUANTIZATION
+				REMAP_DATA(mPosData, AABBNoLeafNode)
+				REMAP_DATA(mNegData, AABBNoLeafNode)
+			}
 		}
 
 		DELETEARRAY(Nodes);
+		CHECKALLOC(mNodes);
 	}
 
 	return true;
